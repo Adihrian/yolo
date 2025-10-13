@@ -23,6 +23,7 @@ services:
       - Adih-yolo-backend
     environment:
       - REACT_APP_BACKEND_URL=http://Adih-yolo-backend:5000
+      - NODE_OPTIONS=--openssl-legacy-provider
     networks:
       - app-net
 
