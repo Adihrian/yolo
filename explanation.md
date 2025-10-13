@@ -49,8 +49,12 @@ I used lightweight and stable images to ensure proper working performance and to
 
 # 7. Docker Image Versioning
     - used semantic versioning for both the frontend and the backend images:
-        Frontend : adrianapindi/yolo-client:v1.2.0
+        Frontend : adrianapindi/yolo-client:v1.2.0 
         Backend  : adrianapindi/yolo-backend:v1.2.0
+
+![Frontend Docker Hub image](screenshots/Frontend-image.png)
+![Backend Docker Hub image](screenshots/Backend-image.png)
+
 
 # 8. Docker Hub Deployment
     - All images are pushed to Docker Hub with semantic versioning
