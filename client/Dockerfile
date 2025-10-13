@@ -4,6 +4,9 @@ FROM node:18-alpine AS build
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
+#To avoid the OpenSSL error
+ENV NODE_OPTIONS=--openssl-legacy-provider
+
 # Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
 RUN npm ci --only=production
