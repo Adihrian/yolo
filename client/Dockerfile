@@ -6,23 +6,18 @@ WORKDIR /usr/src/app
 
 # Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
+RUN npm ci --only=production
 
-# Install application dependencies
-RUN npm install
-
-# Copy the rest of the application code to the container
+# Copy the rest of the application code to the container and build the app
 COPY . .
+RUN npm run build
 
-FROM node:18-alpine
+FROM nginx:alpine
 
-WORKDIR /app
-
-RUN apk update && apk add npm
-
-COPY --from=build /usr/src/app /app
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
 
 # Expose the port the app runs on
-EXPOSE 3000
+EXPOSE 80
 
 # Define the command to run your app
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]
