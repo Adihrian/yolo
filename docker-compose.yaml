@@ -11,24 +11,26 @@ version: "3.8"
 services:
 
   #Builds the frontend Docker image and creates the frontend microservice
-  brian-yolo-client:
-    image: brianbwire/brian-yolo-client:v1.0.0
+  Adih-yolo-client:
+    image: adrianapindi-yolo-client:v1.0.0
     build: ./client
-    container_name: brian-yolo-client
+    container_name: Adih-yolo-client
     stdin_open: true
     tty: true
     ports:
       - "3000:3000"
     depends_on: 
-      - brian-yolo-backend
+      - adih-yolo-backend
+    environment:
+      - REACT_APP_BACKEND_URL=http://Adih-yolo-backend:5000
     networks:
       - app-net
 
   #Builds the backend Docker image and creates the backend microservice
-  brian-yolo-backend:
-    image: brianbwire/brian-yolo-backend:v1.0.0
+  Adih-yolo-backend:
+    image: adrianapindi-yolo-backend:v1.0.0
     build: ./backend
-    container_name: brian-yolo-backend
+    container_name: Adih-yolo-backend
     stdin_open: true
     tty: true
     restart: always
@@ -36,6 +38,8 @@ services:
       - "5000:5000"
     depends_on: 
       - app-ip-mongo
+    environment:
+      - MONGODB_URL=mongodb://app-ip-mongo:27017/yolomy
     networks:
       - app-net
 
