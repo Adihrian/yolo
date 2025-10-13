@@ -12,7 +12,7 @@ services:
 
   #Builds the frontend Docker image and creates the frontend microservice
   Adih-yolo-client:
-    image: adrianapindi-yolo-client:v1.0.0
+    image: adrianapindi-yolo-client:v1.2.0
     build: ./client
     container_name: Adih-yolo-client
     stdin_open: true
@@ -25,7 +25,7 @@ services:
       - REACT_APP_BACKEND_URL=http://Adih-yolo-backend:5000
       - NODE_OPTIONS=--openssl-legacy-provider
     networks:
-      - app-net
+      - yolo-net
 
   #Builds the backend Docker image and creates the backend microservice
   Adih-yolo-backend:
@@ -42,7 +42,7 @@ services:
     environment:
       - MONGODB_URL=mongodb://app-ip-mongo:27017/yolomy
     networks:
-      - app-net
+      - yolo-net
 
   #Creates the database microservice
   app-ip-mongo:
@@ -51,7 +51,7 @@ services:
     ports:
       - "27017:27017"
     networks:
-      - app-net
+      - yolo-net
     volumes:
       - type: volume
         source: app-mongo-data
@@ -59,8 +59,8 @@ services:
 
 #Creates the network infrastructure necessary for the containers to communicate with each other
 networks:
-  app-net:
-    name: app-net
+  yolo-net:
+    name: yolo-net
     driver: bridge
     attachable: true
     ipam:
