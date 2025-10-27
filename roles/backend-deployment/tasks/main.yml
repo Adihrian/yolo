@@ -13,4 +13,6 @@
     ports:
       - "5000:5000"
     command: "npm start"
+    env:
+      MONGODB_URI: "mongodb://192.168.56.13:27017/yolomy"
   become: yes
