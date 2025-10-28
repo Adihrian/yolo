@@ -12,7 +12,7 @@ The platform allows users to add retail products through a dashboard, showcasing
 - [Ansible](https://docs.ansible.com/) installed
 - Git
 
----
+--- 
 
 ## **Setup Instructions**
 
