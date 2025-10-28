@@ -19,6 +19,8 @@ The platform allows users to add retail products through a dashboard, showcasing
 1. **Clone the repository**
 
 git clone https://github.com/Adihrian/yolo
+
+
 cd yolo
 
 2. **Start the Vagrant VM**
