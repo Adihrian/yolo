@@ -3,7 +3,8 @@
   hosts: all
   become: true
   roles:
-    - setup-docker
+    - role: setup-docker
+      tags: ['docker']
 
 - name: Create Docker network
   hosts: all
@@ -19,16 +20,25 @@
   hosts: database
   become: true
   roles:
-    - setup-mongodb
+    - role: setup-mongodb
+      tags: ['database']
 
 - name: Deploy backend service
   hosts: backend
   become: true
   roles:
-    - backend-deployment
+    - role: backend-deployment
+      tags: ['backend']
+      vars:
+        backend_network: yolo-net
+        wait_for_db: true
 
 - name: Deploy frontend service
   hosts: frontend
   become: true
   roles:
-    - frontend-deployment
+    - role: frontend-deployment
+      tags: ['frontend']
+      vars:
+        frontend_network: yolo-net
+        backend_host: yolo-backend
