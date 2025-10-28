@@ -1,70 +1,67 @@
-#   Explanation for Docker Project
+### **explanation.md** (Stage 1)
 
-# 1. Choice of Base Image
+```markdown
+# YOLO E-commerce Platform - Stage 1 Explanation
 
-I used lightweight and stable images to ensure proper working performance and to also achieve smaller image sizes:
+This document explains the design and execution of the Stage 1 Ansible playbook for the YOLO E-commerce platform.
 
-    - Frontend:
-        Base image : node:18-alpine
-        I used this base image to minimize on the amount of space used since Alpine is lightweight and to also maintain the compatibility with React npm.
-    
-    - Backend:
-        Base image: node:18-alpine
-        The Backend uses Express and MOngoDb connection drivers. Node 18 is compatible with all of the packages, and the size of the image is kept small by Alpine.
+---
 
-# 2. Dockerfile Directives
+## **Order of Execution of Roles**
 
-    - A multistaged build was used for both frontend and backend Dockerfile to reduce the image sizes and remove unnecessary build tools.
-    
-    -Both the frontend and backend Dockerfile is structured using standard practices i.e WORKDIR, COPY, EXPOSE ...
+1. **setup-docker**  
+   - Installs Docker and dependencies on all hosts.
+   - Ensures Docker service is running and ready for container deployments.
 
-# 3. Docker Compose Networking
+2. **Create Docker network (task block)**  
+   - Creates a Docker bridge network `yolo-net`.
+   - Ensures all containers can communicate using service names.
 
-    -i used a custom network called yolo-net and implemented a bridge network to allow for the communication of the frontend, backend and the MongoDB containers to communicate internally.
+3. **setup-mongodb**  
+   - Deploys the MongoDB container on the `database` host.
+   - Connects MongoDB to `yolo-net` network.
 
-    - The backend connects to MongoDB using mongodb://app-ip-mongo:27017/yolomy
+4. **backend-deployment**  
+   - Deploys the backend container on the `backend` host.
+   - Connects backend to `yolo-net` and links it to MongoDB.
 
-    - The frontend connects to the backend via http://Adih-yolo-backend:5000
+5. **frontend-deployment**  
+   - Deploys the frontend container on the `frontend` host.
+   - Connects frontend to `yolo-net` and links it to the backend service.
 
-# 4. Docker Copose Volume DEfinition
+> **Note:** The order is important. Docker must be installed before containers are deployed. The network must exist before containers join it. MongoDB must be available before backend deployment. Backend must be ready before frontend deployment to ensure service connectivity.
 
-    -I used app-mongo-data for the volume to ensure that the added products are not lost when containers restart.
+---
 
-# 5. Git Workflow
-     
-    - The repository was forked from the original template and then cloned locally to my machine.  
-    - Used multiple descriptive commits to track each major change.  
-    - Once confirmed functional, changes were pushed to GitHub.  
-    - Docker images were built and pushed to Docker Hub for deployment and verification with proper semantic versioning.
+## **Role Functions**
 
-# 6. Successful Running & Debugging Measures
-    - I verified that the frontend and the backend communicate successfully.
-    - Addressed ERR_OSSL_EVP_UNSUPPORTED in React build by adding:
-        environment:
-           NODE_OPTIONS=--openssl-legacy-provider
+- **setup-docker**: Installs Docker, Docker Compose (if needed), and configures dependencies.
+- **setup-mongodb**: Pulls and runs the MongoDB container, sets initial configurations.
+- **backend-deployment**: Pulls and runs the backend container, ensures it connects to MongoDB.
+- **frontend-deployment**: Pulls and runs the frontend container, connects to the backend service.
 
-    - Optimized image sizes to be below 400MB
-    - Frontend runs on : http://localhost:3000
-    - Backend runs on : http://localhost:5000/api/products
+---
 
-# 7. Docker Image Versioning
-    - used semantic versioning for both the frontend and the backend images:
-        Frontend : adrianapindi/yolo-client:v1.2.0 
-        Backend  : adrianapindi/yolo-backend:v1.2.0
+## **Ansible Modules Used**
 
-![Frontend Docker Hub image](screenshots/Frontend-image.png)
-![Backend Docker Hub image](screenshots/Backend-image.png)
+- `apt` / `package`: For installing Docker dependencies.
+- `service`: Ensures Docker service is running.
+- `docker_network`: Creates a Docker bridge network.
+- `docker_container`: Pulls and runs containers (MongoDB, backend, frontend).
+- `git`: Clones the application repository if needed.
 
+---
 
-# 8. Docker Hub Deployment
-    - All images are pushed to Docker Hub with semantic versioning
-    - Verify images by running 
-        docker pull adrianapindi/yolo-client:v1.2.0
-        docker pull adrianapindi/yolo-backend:v1.2.0
+## **Why the Order Matters**
 
+1. **Docker first** → Containers depend on Docker being installed.  
+2. **Network second** → All containers need the same network to communicate.  
+3. **Database next** → Backend cannot start without an accessible database.  
+4. **Backend next** → Frontend depends on backend for API requests.  
+5. **Frontend last** → Ensures the application is fully functional in the browser after all services are up.
 
+---
 
+## **Conclusion**
 
-
-
-The project has been able to containerize the e-commerce web application into the frontend and backend and MongoDB services. Images are optimized and their versioning is done correctly and the system is launched without any issues when used with docker-compose.
+Following this order guarantees a smooth deployment where all services can communicate correctly and the e-commerce platform is functional immediately after running the playbook.
