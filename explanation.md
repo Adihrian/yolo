@@ -65,3 +65,4 @@ This document explains the design and execution of the Stage 1 Ansible playbook 
 ## **Conclusion**
 
 Following this order guarantees a smooth deployment where all services can communicate correctly and the e-commerce platform is functional immediately after running the playbook.
+ 
