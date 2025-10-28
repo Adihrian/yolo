@@ -66,3 +66,13 @@ This document explains the design and execution of the Stage 1 Ansible playbook 
 
 Following this order guarantees a smooth deployment where all services can communicate correctly and the e-commerce platform is functional immediately after running the playbook.
  
+
+
+ ## **Stage 2 Explanation**
+ Due to Terraform provider limitations, the VirtualBox provider required for local VM provisioning could not be downloaded or initialized:
+
+Terraform registry no longer hosts a supported VirtualBox provider that matches the required version constraints.
+
+Attempts to use alternative providers (e.g., kreuzwerker/virtualbox) also failed because they are no longer available on the Terraform registry.
+
+As a result, it was not possible to fully automate VM provisioning using Terraform in this environment.
