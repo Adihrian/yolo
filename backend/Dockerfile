@@ -24,7 +24,7 @@ COPY --from=build /usr/src/app /app
 EXPOSE 5000
 
 
-ENV MONGODB_URI=mongodb://app-mongo:27017/yolomy
+ENV MONGODB_URI=mongodb://yolo-mongo:27017/yolomy
 
 # Define the command to run your app
 CMD ["node", "server.js"]
