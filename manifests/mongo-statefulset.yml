@@ -1,9 +1,7 @@
-# mongo-statefulset.yaml
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: mongo
-  namespace: default
 spec:
   serviceName: "mongo"
   replicas: 1
@@ -16,21 +14,19 @@ spec:
         app: mongo
     spec:
       containers:
-      - name: mongo
-        image: mongo:6.0
-        ports:
-        - containerPort: 27017
-        volumeMounts:
-        - name: mongo-persistent-storage
-          mountPath: /data/db
-        env:
-        - name: MONGO_INITDB_DATABASE
-          value: "yolo-db"
+        - name: mongo
+          image: mongo:6.0
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-storage
+              mountPath: /data/db
   volumeClaimTemplates:
-  - metadata:
-      name: mongo-persistent-storage
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
+    - metadata:
+        name: mongo-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
+
