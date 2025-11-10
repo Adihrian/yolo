@@ -1,54 +1,57 @@
 # YOLO E-commerce Platform - Stage 1
 
-This repository contains the Stage 1 implementation of the YOLO E-commerce platform using **Vagrant**, **Docker**, and **Ansible**.  
+This is a full-stack e-commerce application deployed on **Google Kubernetes Engine (GKE)**. The application allows users to view products and add them to the cart.
+
 The platform allows users to add retail products through a dashboard, showcasing containerized backend, frontend, and database services.
 
 ---
 
-## **Prerequisites**
+# Live Application
 
-- [Vagrant](https://www.vagrantup.com/) installed
-- [VirtualBox](https://www.virtualbox.org/) or any other Vagrant provider
-- [Ansible](https://docs.ansible.com/) installed
-- Git
+Access the deployed app here: [http://34.68.194.35/](http://34.68.194.35/)
 
---- 
+> Note: If adding products does not work, ensure the backend service is accessible at `http://backend-service:5000` from the frontend.
 
-## **Setup Instructions**
+---
 
-1. **Clone the repository**
+## ubernetes Objects Used
 
-git clone https://github.com/Adihrian/yolo
+- **StatefulSet**: MongoDB database for persistent storage.
+- **Deployments**: Backend and frontend for scalability and self-healing.
+- **Services**:
+  - `LoadBalancer`: Exposes frontend to the public internet.
+  - `ClusterIP`: Backend and MongoDB services for internal communication.
+- **PersistentVolume & PersistentVolumeClaim**: Ensures MongoDB data persists if pods are deleted.
+
+---
+
+## Docker Images
+
+- Backend: `adrianapindi/yolo-backend:v1.0.1`
+- Frontend: `adrianapindi/yolo-frontend:v1.0.0`
+- MongoDB: Official MongoDB image -> mongo:6
+
+---
+
+## Steps to Deploy
+
+1. Create Kubernetes objects in the following order:
+
+kubectl apply -f manifests/mongo-statefulset.yml
+kubectl apply -f manifests/mongo-service.yml
+kubectl apply -f manifests/backend-deployment.yml
+kubectl apply -f manifests/backend-service.yml
+kubectl apply -f manifests/client-deployment.yml
+kubectl apply -f manifests/client-service.yml
+
+2. Verify pods and services
+kubectl get pods
+kubectl get svc
 
 
-cd yolo
+## Notes
+Ensure environment variables (e.g., MONGO_URL) are correctly set in backend deployment.
 
-2. **Start the Vagrant VM**
-vagrant up
+Persistent storage is implemented via StatefulSet and PVC for MongoDB.
 
-3. **Run the ansible playbook**
-ansible-playbook site.yml -i inventory
-
-The playbook sets up Docker, creates Docker network, and deploys MongoDB, backend and frontend containers.
-
-4. **Access the application**
-
-Frontend: http://localhost:3000
-
-Backend: http://localhost:5000
-
-MongoDB: mongodb://localhost:27017 
-
-5. **Test Functionality**
-
-Open the frontend URL in your browser.
-
-Add a product through the provided form to verify the "Add Product" functionality.
-
-Check database persistence if needed.
-
-
-
-**Notes**
-
-Ensure ports 3000, 5000, and 27017 are not blocked or used by other services on your host machine.
+Frontend connects to backend using backend-service:5000 internally.
