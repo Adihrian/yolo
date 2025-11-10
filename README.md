@@ -14,7 +14,7 @@ Access the deployed app here: [http://34.68.194.35/](http://34.68.194.35/)
 
 ---
 
-## ubernetes Objects Used
+## kubernetes Objects Used
 
 - **StatefulSet**: MongoDB database for persistent storage.
 - **Deployments**: Backend and frontend for scalability and self-healing.
