@@ -1,78 +1,45 @@
-### **explanation.md** (Stage 1)
+# Explanation of Implementation
 
-```markdown
-# YOLO E-commerce Platform - Stage 1 Explanation
+## 1. Choice of Kubernetes Objects
 
-This document explains the design and execution of the Stage 1 Ansible playbook for the YOLO E-commerce platform.
-
----
-
-## **Order of Execution of Roles**
-
-1. **setup-docker**  
-   - Installs Docker and dependencies on all hosts.
-   - Ensures Docker service is running and ready for container deployments.
-
-2. **Create Docker network (task block)**  
-   - Creates a Docker bridge network `yolo-net`.
-   - Ensures all containers can communicate using service names.
-
-3. **setup-mongodb**  
-   - Deploys the MongoDB container on the `database` host.
-   - Connects MongoDB to `yolo-net` network.
-
-4. **backend-deployment**  
-   - Deploys the backend container on the `backend` host.
-   - Connects backend to `yolo-net` and links it to MongoDB.
-
-5. **frontend-deployment**  
-   - Deploys the frontend container on the `frontend` host.
-   - Connects frontend to `yolo-net` and links it to the backend service.
-
-> **Note:** The order is important. Docker must be installed before containers are deployed. The network must exist before containers join it. MongoDB must be available before backend deployment. Backend must be ready before frontend deployment to ensure service connectivity.
+- **MongoDB StatefulSet**: Chosen to maintain stable network identity and persistent storage for the database. This ensures data is not lost even if pods are restarted or rescheduled.
+- **Deployments**: Used for backend and frontend for automated updates, self-healing, and easy scaling.
+- **Services**:
+  - **LoadBalancer**: Frontend exposed to the internet so users can access the application publicly.
+  - **ClusterIP**: Backend and MongoDB services are internal, allowing pods to communicate within the cluster securely.
+- **Labels and Annotations**: Included in all Kubernetes objects to track versions, pods, and for selection by services.
 
 ---
 
-## **Role Functions**
+## 2. Exposure to Internet Traffic
 
-- **setup-docker**: Installs Docker, Docker Compose (if needed), and configures dependencies.
-- **setup-mongodb**: Pulls and runs the MongoDB container, sets initial configurations.
-- **backend-deployment**: Pulls and runs the backend container, ensures it connects to MongoDB.
-- **frontend-deployment**: Pulls and runs the frontend container, connects to the backend service.
+- The frontend service uses a `LoadBalancer`, which automatically provisions an external IP on GKE. Users can access the application using this IP.
+- Backend and MongoDB are internal (`ClusterIP`) to prevent direct public access.
 
 ---
 
-## **Ansible Modules Used**
+## 3. Persistent Storage
 
-- `apt` / `package`: For installing Docker dependencies.
-- `service`: Ensures Docker service is running.
-- `docker_network`: Creates a Docker bridge network.
-- `docker_container`: Pulls and runs containers (MongoDB, backend, frontend).
-- `git`: Clones the application repository if needed.
+- **MongoDB StatefulSet** uses a **PersistentVolumeClaim (PVC)** to attach storage.  
+- Without PVC, data in MongoDB would be lost if the pod is deleted. PVC ensures the items added to the cart persist even after pod restarts.
 
 ---
 
-## **Why the Order Matters**
+## 4. Git Workflow
 
-1. **Docker first** → Containers depend on Docker being installed.  
-2. **Network second** → All containers need the same network to communicate.  
-3. **Database next** → Backend cannot start without an accessible database.  
-4. **Backend next** → Frontend depends on backend for API requests.  
-5. **Frontend last** → Ensures the application is fully functional in the browser after all services are up.
+- Commits were made incrementally for each feature:
+  1. Initial project setup with Dockerfiles and basic app structure.
+  2. Backend development and Docker image creation.
+  3. Frontend development and Docker image creation.
+  4. Kubernetes manifests creation for backend, frontend, and MongoDB.
+  5. Deployment and debugging on Minikube and GKE.
+- Each commit is descriptive and reflects the step being implemented.
+- GitHub repository contains both `README.md` and `explanation.md`.
 
 ---
 
-## **Conclusion**
+## 5. Debugging and Notes
 
-Following this order guarantees a smooth deployment where all services can communicate correctly and the e-commerce platform is functional immediately after running the playbook.
- 
-
-
- ## **Stage 2 Explanation**
- Due to Terraform provider limitations, the VirtualBox provider required for local VM provisioning could not be downloaded or initialized:
-
-Terraform registry no longer hosts a supported VirtualBox provider that matches the required version constraints.
-
-Attempts to use alternative providers (e.g., kreuzwerker/virtualbox) also failed because they are no longer available on the Terraform registry.
-
-As a result, it was not possible to fully automate VM provisioning using Terraform in this environment.
+- Initially, the backend could not connect to MongoDB because the service name was incorrect.
+- After fixing the `MONGO_URL` to `mongodb://mongo:27017/yolomy`, the backend started successfully.
+- Frontend must reference backend as `http://backend-service:5000` for proper communication.
