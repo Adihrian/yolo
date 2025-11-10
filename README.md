@@ -37,13 +37,12 @@ Access the deployed app here: [http://34.68.194.35/](http://34.68.194.35/)
 
 1. Create Kubernetes objects in the following order:
 ```bash
-kubectl apply -f k8s/mongo-statefulset.yml
-kubectl apply -f k8s/mongo-service.yml
-kubectl apply -f k8s/backend-deployment.yml
-kubectl apply -f k8s/backend-service.yml
-kubectl apply -f k8s/client-deployment.yml
-kubectl apply -f k8s/client-service.yml
-
+kubectl apply -f manifests/mongo-statefulset.yml
+kubectl apply -f manifests/mongo-service.yml
+kubectl apply -f manifests/backend-deployment.yml
+kubectl apply -f manifests/backend-service.yml
+kubectl apply -f manifests/client-deployment.yml
+kubectl apply -f manifests/client-service.yml
 
 
 2. Verify pods and services
